@@ -27,7 +27,7 @@ ENTRY_PERIOD = 20    # 진입: 20일 최고가 돌파
 EXIT_PERIOD  = 20    # 익절: 20일 최저가 역돌파
 ATR_PERIOD   = 14    # ATR 기간
 ATR_MULT     = 2.0   # 손절: 진입가 - 2×ATR
-MAX_SIGNALS  = 3     # 하루 최대 진입 신호 수 (초과 시 ADX 상위 3개만)
+MAX_SIGNALS  = 999   # 제한 없음 (ADX 높은 순 정렬만)
 
 # 50종목 + 섹터 정보
 SYMBOLS = {
@@ -96,6 +96,28 @@ SYMBOLS = {
     "TMUS":  "통신",
     "SPOT":  "미디어",
     "T":     "통신",
+}
+
+# 종목 한국명
+NAMES = {
+    "NVDA": "엔비디아", "MSFT": "마이크로소프트", "AAPL": "애플",
+    "GOOGL": "구글", "META": "메타", "AMZN": "아마존",
+    "TSLA": "테슬라", "PLTR": "팔란티어", "AMD": "AMD",
+    "AVGO": "브로드컴", "QCOM": "퀄컴", "MU": "마이크론",
+    "AMAT": "어플라이드머티리얼즈", "ASML": "ASML", "ARM": "ARM",
+    "CRWD": "크라우드스트라이크", "NOW": "서비스나우", "DDOG": "데이터독",
+    "NET": "클라우드플레어", "PANW": "팔로알토", "ORCL": "오라클",
+    "INTU": "인튜이트", "JPM": "JP모건", "GS": "골드만삭스",
+    "V": "비자", "MA": "마스터카드", "BLK": "블랙록", "HOOD": "로빈후드",
+    "LMT": "록히드마틴", "RTX": "RTX", "GE": "GE", "CAT": "캐터필러",
+    "DE": "존디어", "NOC": "노스럽그러먼", "XOM": "엑슨모빌",
+    "CVX": "쉐브론", "COP": "코노코필립스", "SLB": "슐럼버거",
+    "EOG": "EOG리소시스", "LLY": "일라이릴리", "UNH": "유나이티드헬스",
+    "ABBV": "애브비", "TMO": "써모피셔", "MRK": "머크",
+    "COST": "코스트코", "WMT": "월마트", "HD": "홈디포", "MCD": "맥도날드",
+    "UBER": "우버", "COIN": "코인베이스", "IONQ": "아이온큐",
+    "MSTR": "마이크로스트래티지", "TMUS": "T모바일", "SPOT": "스포티파이",
+    "T": "AT&T",
 }
 
 
@@ -182,19 +204,60 @@ def check_signal(df):
 # ─────────────────────────────────────────────────────────────
 # 4. 디스코드 메시지 포맷
 # ─────────────────────────────────────────────────────────────
-def format_entry(symbol, sector, sig):
-    """롱 진입 알림 메시지"""
-    return (
-        f"🟢 **롱 진입 | {symbol} ({sector})**\n"
-        f"현재가: `${sig['price']}`\n"
-        f"20일 고점 돌파: `${sig['high_20']}`\n"
-        f"손절가: `${sig['stop']}` (진입가 - 2×ATR)\n"
-        f"추세강도 ADX: `{sig['adx']}`"
-    )
+def build_msg1(date_str, entry_signals):
+    """메시지 1 — 롱 진입 (ADX 높은 순 정렬)"""
+    lines = [f"📅 **{date_str}**\n", "🟢 **롱 진입**\n"]
+    for e in entry_signals:
+        s, sec, sig = e["symbol"], e["sector"], e["sig"]
+        # 종목 한국명 매핑 (없으면 티커 그대로)
+        name = NAMES.get(s, s)
+        lines.append(
+            f"🔹 {name} ({s} · {sec})\n"
+            f"　- 진입가 : ${sig['price']}\n"
+            f"　- 손절가 : ${sig['stop']}\n"
+            f"　- ADX　 : {sig['adx']}\n"
+            f"{'─'*24}"
+        )
+    return "\n".join(lines)
+
+
+def build_msg2(date_str, exit_list, stop_list):
+    """메시지 2 — 익절 + 손절 합산"""
+    lines = [f"📅 **{date_str}**\n"]
+
+    if exit_list:
+        lines.append("💰 **익절**\n")
+        for e in exit_list:
+            s, sec, sig = e["symbol"], e["sector"], e["sig"]
+            name = NAMES.get(s, s)
+            pnl = round((sig['price'] - sig['entry_price']) / sig['entry_price'] * 100, 2)
+            lines.append(
+                f"✅ {name} ({s} · {sec})\n"
+                f"　- 진입가 : ${sig['entry_price']}\n"
+                f"　- 익절가 : ${sig['price']}\n"
+                f"　- 수익률 : +{pnl}%\n"
+                f"{'─'*24}"
+            )
+
+    if stop_list:
+        lines.append("🛑 **손절**\n")
+        for e in stop_list:
+            s, sec, sig = e["symbol"], e["sector"], e["sig"]
+            name = NAMES.get(s, s)
+            pnl = round((sig['price'] - sig['entry_price']) / sig['entry_price'] * 100, 2)
+            lines.append(
+                f"❌ {name} ({s} · {sec})\n"
+                f"　- 진입가 : ${sig['entry_price']}\n"
+                f"　- 손절가 : ${sig['price']}\n"
+                f"　- 수익률 : {pnl}%\n"
+                f"{'─'*24}"
+            )
+
+    return "\n".join(lines)
 
 
 def format_exit(symbol, sector, sig):
-    """익절 알림 메시지"""
+    """익절 알림 메시지 (레거시 — 미사용)"""
     return (
         f"⬜ **익절 | {symbol} ({sector})**\n"
         f"현재가: `${sig['price']}`\n"
@@ -234,31 +297,32 @@ def send_discord(message):
 def main():
     print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] 스캔 시작 — {len(SYMBOLS)}종목")
 
-    entry_signals = []   # 진입 신호 목록 (ADX 필터용)
-    exit_msgs     = []   # 익절 메시지
-    stop_msgs     = []   # 손절 메시지
-    errors        = []   # 오류 종목
+    date_str      = datetime.now().strftime('%Y-%m-%d')
+    entry_signals = []   # 진입 신호
+    exit_list     = []   # 익절 신호
+    stop_list     = []   # 손절 신호
 
     for symbol, sector in SYMBOLS.items():
         try:
             df = get_data(symbol)
             if df is None:
-                errors.append(symbol)
                 continue
 
             sig = check_signal(df)
             if sig is None:
                 continue
 
-            # 익절 신호
+            # 익절: 20일 최저가 역돌파
             if sig["exit"]:
-                exit_msgs.append(format_exit(symbol, sector, sig))
+                sig["entry_price"] = sig["low_20"]  # 정확한 진입가는 별도 기록 필요
+                exit_list.append({"symbol": symbol, "sector": sector, "sig": sig})
 
-            # 손절 신호 (현재가가 손절가 아래)
+            # 손절: 현재가가 ATR 손절가 아래
             if sig["price"] <= sig["stop"]:
-                stop_msgs.append(format_stop(symbol, sector, sig))
+                sig["entry_price"] = sig["stop"] + (ATR_MULT * sig["atr"])
+                stop_list.append({"symbol": symbol, "sector": sector, "sig": sig})
 
-            # 진입 신호 (ADX 필터를 위해 모아둠)
+            # 진입: 20일 최고가 돌파
             if sig["entry"]:
                 entry_signals.append({
                     "symbol": symbol, "sector": sector,
@@ -268,39 +332,26 @@ def main():
             print(f"[완료] {symbol}: 진입={sig['entry']} 익절={sig['exit']} ADX={sig['adx']}")
 
         except Exception as e:
-            errors.append(f"{symbol}({e})")
+            print(f"[오류] {symbol}: {e}")
 
-    # 진입 신호 ADX 필터 — 3개 초과 시 ADX 높은 순으로 자름
-    if len(entry_signals) > MAX_SIGNALS:
-        entry_signals = sorted(entry_signals, key=lambda x: x["adx"], reverse=True)
-        entry_signals = entry_signals[:MAX_SIGNALS]
-        print(f"[필터] 진입 신호 {len(entry_signals)}개 초과 → ADX 상위 {MAX_SIGNALS}개 선택")
+    # 진입 신호: ADX 높은 순 정렬 (개수 제한 없음)
+    entry_signals = sorted(entry_signals, key=lambda x: x["adx"], reverse=True)
 
-    entry_msgs = [format_entry(e["symbol"], e["sector"], e["sig"])
-                  for e in entry_signals]
+    # ── 메시지 1: 롱 진입 ──
+    if entry_signals:
+        send_discord(build_msg1(date_str, entry_signals))
 
-    # ── 최종 메시지 조립 ──
-    header = (
-        f"**📊 터틀 신호 | {datetime.now().strftime('%Y-%m-%d')} 아침 9시**\n"
-        f"스캔: {len(SYMBOLS)}종목 | "
-        f"진입 {len(entry_msgs)}건 | 익절 {len(exit_msgs)}건 | 손절 {len(stop_msgs)}건\n"
-        f"{'─'*40}"
-    )
+    # ── 메시지 2: 익절 + 손절 ──
+    if exit_list or stop_list:
+        send_discord(build_msg2(date_str, exit_list, stop_list))
 
-    sections = [header]
+    # ── 신호 없을 때 ──
+    if not entry_signals and not exit_list and not stop_list:
+        send_discord(f"📅 **{date_str}**\n✅ 오늘 신호 없음")
 
-    if entry_msgs:
-        sections.append("\n".join(entry_msgs))
-    if exit_msgs:
-        sections.append("\n".join(exit_msgs))
-    if stop_msgs:
-        sections.append("\n".join(stop_msgs))
-    if not entry_msgs and not exit_msgs and not stop_msgs:
-        sections.append("✅ 오늘 신호 없음")
-
-    send_discord("\n\n".join(sections))
     print("완료")
 
 
 if __name__ == "__main__":
     main()
+    
