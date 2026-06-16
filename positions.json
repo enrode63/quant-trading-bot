@@ -1,0 +1,42 @@
+{
+  "MU": {
+    "entry_price": 1042.52,
+    "entry_date": "2026-06-16"
+  },
+  "AMAT": {
+    "entry_price": 578.16,
+    "entry_date": "2026-06-16"
+  },
+  "ARM": {
+    "entry_price": 403.73,
+    "entry_date": "2026-06-16"
+  },
+  "JPM": {
+    "entry_price": 330.48,
+    "entry_date": "2026-06-16"
+  },
+  "HOOD": {
+    "entry_price": 96.27,
+    "entry_date": "2026-06-16"
+  },
+  "RTX": {
+    "entry_price": 186.34,
+    "entry_date": "2026-06-16"
+  },
+  "GE": {
+    "entry_price": 352.52,
+    "entry_date": "2026-06-16"
+  },
+  "CAT": {
+    "entry_price": 959.92,
+    "entry_date": "2026-06-16"
+  },
+  "HD": {
+    "entry_price": 336.57,
+    "entry_date": "2026-06-16"
+  },
+  "MCD": {
+    "entry_price": 287.38,
+    "entry_date": "2026-06-16"
+  }
+}
