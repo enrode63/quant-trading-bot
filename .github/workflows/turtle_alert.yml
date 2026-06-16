@@ -1,4 +1,3 @@
-
 # .github/workflows/turtle_alert.yml
 # 저장소에 이 파일을 넣으면 매일 아침 9시(한국시간) 자동 실행됩니다
 
@@ -6,8 +5,8 @@ name: 터틀 전략 디스코드 알림
 
 on:
   schedule:
-    # 한국시간 09:00 = UTC 00:00
-    - cron: "0 0 * * 1-5"   # 월~금만 실행 (주말 미국 장 없음)
+    # 한국시간 09:00 = UTC 00:00 (정각은 혼잡해서 9분으로 분산)
+    - cron: "9 0 * * 1-5"   # 월~금만 실행 (주말 미국 장 없음)
 
   # GitHub Actions 탭에서 수동 실행도 가능
   workflow_dispatch:
@@ -32,3 +31,4 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python turtle_bot.py
+        
