@@ -15,6 +15,9 @@ jobs:
   run-bot:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write   # positions.json을 저장소에 커밋하기 위해 필요
+
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
@@ -31,4 +34,12 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python turtle_bot.py
-        
+
+      # 포지션 상태(positions.json)를 저장소에 커밋 — 다음 실행에서 기억하도록
+      - name: 포지션 상태 저장
+        run: |
+          git config user.name "turtle-bot"
+          git config user.email "bot@noreply.github.com"
+          git add positions.json
+          git diff --staged --quiet || git commit -m "포지션 상태 업데이트 $(date +%Y-%m-%d)"
+          git push
