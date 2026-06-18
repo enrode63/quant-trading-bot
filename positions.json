@@ -38,5 +38,17 @@
   "MCD": {
     "entry_price": 287.38,
     "entry_date": "2026-06-16"
+  },
+  "ASML": {
+    "entry_price": 1867.83,
+    "entry_date": "2026-06-18"
+  },
+  "GS": {
+    "entry_price": 1099.14,
+    "entry_date": "2026-06-18"
+  },
+  "V": {
+    "entry_price": 330.38,
+    "entry_date": "2026-06-18"
   }
 }
