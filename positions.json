@@ -35,10 +35,6 @@
     "entry_price": 336.57,
     "entry_date": "2026-06-16"
   },
-  "MCD": {
-    "entry_price": 287.38,
-    "entry_date": "2026-06-16"
-  },
   "ASML": {
     "entry_price": 1867.83,
     "entry_date": "2026-06-18"
@@ -50,5 +46,13 @@
   "V": {
     "entry_price": 330.38,
     "entry_date": "2026-06-18"
+  },
+  "AMD": {
+    "entry_price": 546.0,
+    "entry_date": "2026-06-22"
+  },
+  "ABBV": {
+    "entry_price": 231.39,
+    "entry_date": "2026-06-22"
   }
 }
