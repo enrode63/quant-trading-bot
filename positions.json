@@ -54,5 +54,13 @@
   "ABBV": {
     "entry_price": 231.39,
     "entry_date": "2026-06-22"
+  },
+  "DE": {
+    "entry_price": 600.75,
+    "entry_date": "2026-06-25"
+  },
+  "UBER": {
+    "entry_price": 73.85,
+    "entry_date": "2026-06-25"
   }
 }
