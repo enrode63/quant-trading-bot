@@ -62,5 +62,21 @@
   "UBER": {
     "entry_price": 73.85,
     "entry_date": "2026-06-25"
+  },
+  "MA": {
+    "entry_price": 488.92,
+    "entry_date": "2026-06-26"
+  },
+  "UNH": {
+    "entry_price": 415.53,
+    "entry_date": "2026-06-26"
+  },
+  "TMO": {
+    "entry_price": 505.75,
+    "entry_date": "2026-06-26"
+  },
+  "MRK": {
+    "entry_price": 125.45,
+    "entry_date": "2026-06-26"
   }
 }
