@@ -78,5 +78,13 @@
   "MRK": {
     "entry_price": 125.45,
     "entry_date": "2026-06-26"
+  },
+  "PANW": {
+    "entry_price": 327.56,
+    "entry_date": "2026-06-29"
+  },
+  "LLY": {
+    "entry_price": 1222.19,
+    "entry_date": "2026-06-29"
   }
 }
