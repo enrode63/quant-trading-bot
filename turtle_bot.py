@@ -203,12 +203,13 @@ def build_msg2(date_str, exit_list, stop_list):
         lines.append("🛑 **손절**\n")
         for e in stop_list:
             s, sec, sig, entry_price = e["symbol"], e["sector"], e["sig"], e["entry_price"]
+            stop_price = e.get("stop_price", sig["stop"])
             name = NAMES.get(s, s)
             pnl = round((sig['price'] - entry_price) / entry_price * 100, 2)
             lines.append(
                 f"❌ {name} ({s} · {sec})\n"
                 f"　- 진입가 : ${entry_price}\n"
-                f"　- 손절가 : ${sig['price']}\n"
+                f"　- 손절가 : ${stop_price}\n"
                 f"　- 수익률 : {pnl}%\n"
                 f"{'─'*24}"
             )
@@ -257,15 +258,18 @@ def main():
 
             if holding:
                 entry_price = positions[symbol]["entry_price"]
+                stop_price  = positions[symbol]["stop_price"]   # 진입 시점에 고정된 손절가
 
-                # 보유 중 → 익절/손절만 판정 (진입 알림 없음)
-                if sig["price"] <= sig["stop"]:
+                # 손절 우선 판정 (현재가가 고정 손절가 아래로 내려가면 손절)
+                if sig["price"] <= stop_price:
                     stop_list.append({
                         "symbol": symbol, "sector": sector,
                         "sig": sig, "entry_price": entry_price,
+                        "stop_price": stop_price,
                     })
                     del positions[symbol]   # 포지션 종료 → 기억 삭제
 
+                # 익절: 손절 아닌데 20일 저점 역돌파 (추세 꺾임)
                 elif sig["exit"]:
                     exit_list.append({
                         "symbol": symbol, "sector": sector,
@@ -280,10 +284,11 @@ def main():
                         "symbol": symbol, "sector": sector,
                         "sig": sig, "adx": sig["adx"]
                     })
-                    # 새 포지션 기억 (오늘 종가를 진입가로 기록)
+                    # 새 포지션 기억 (진입가 + 손절가 고정 저장)
                     positions[symbol] = {
                         "entry_price": sig["price"],
-                        "entry_date": date_str,
+                        "stop_price":  sig["stop"],   # 진입 시점 ATR 기준 손절가 고정
+                        "entry_date":  date_str,
                     }
 
             print(f"[완료] {symbol}: 보유중={holding} 진입={sig['entry']} 익절={sig['exit']} ADX={sig['adx']}")
