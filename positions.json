@@ -90,5 +90,15 @@
   "CRWD": {
     "entry_price": 193.18,
     "entry_date": "2026-07-02"
+  },
+  "NET": {
+    "entry_price": 268.83,
+    "stop_price": 246.56,
+    "entry_date": "2026-07-08"
+  },
+  "TMUS": {
+    "entry_price": 184.73,
+    "stop_price": 173.12,
+    "entry_date": "2026-07-08"
   }
 }
