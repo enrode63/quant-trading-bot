@@ -100,5 +100,20 @@
     "entry_price": 184.73,
     "stop_price": 173.12,
     "entry_date": "2026-07-08"
+  },
+  "AAPL": {
+    "entry_price": 316.22,
+    "stop_price": 298.39,
+    "entry_date": "2026-07-10"
+  },
+  "META": {
+    "entry_price": 631.48,
+    "stop_price": 585.15,
+    "entry_date": "2026-07-10"
+  },
+  "DDOG": {
+    "entry_price": 269.0,
+    "stop_price": 244.72,
+    "entry_date": "2026-07-10"
   }
 }
