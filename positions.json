@@ -115,5 +115,10 @@
     "entry_price": 269.0,
     "stop_price": 244.72,
     "entry_date": "2026-07-10"
+  },
+  "AMZN": {
+    "entry_price": 245.34,
+    "stop_price": 228.79,
+    "entry_date": "2026-07-13"
   }
 }
