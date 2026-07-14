@@ -120,5 +120,10 @@
     "entry_price": 245.34,
     "stop_price": 228.79,
     "entry_date": "2026-07-13"
+  },
+  "INTU": {
+    "entry_price": 289.76,
+    "stop_price": 266.26,
+    "entry_date": "2026-07-14"
   }
 }
