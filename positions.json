@@ -125,5 +125,10 @@
     "entry_price": 289.76,
     "stop_price": 266.26,
     "entry_date": "2026-07-14"
+  },
+  "EOG": {
+    "entry_price": 138.01,
+    "stop_price": 130.85,
+    "entry_date": "2026-07-15"
   }
 }
