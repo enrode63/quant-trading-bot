@@ -130,5 +130,10 @@
     "entry_price": 138.01,
     "stop_price": 130.85,
     "entry_date": "2026-07-15"
+  },
+  "BLK": {
+    "entry_price": 1093.4,
+    "stop_price": 1041.93,
+    "entry_date": "2026-07-16"
   }
 }
