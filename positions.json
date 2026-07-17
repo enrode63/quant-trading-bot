@@ -135,5 +135,20 @@
     "entry_price": 1093.4,
     "stop_price": 1041.93,
     "entry_date": "2026-07-16"
+  },
+  "MSFT": {
+    "entry_price": 401.1,
+    "stop_price": 376.12,
+    "entry_date": "2026-07-17"
+  },
+  "XOM": {
+    "entry_price": 145.95,
+    "stop_price": 140.0,
+    "entry_date": "2026-07-17"
+  },
+  "CVX": {
+    "entry_price": 183.86,
+    "stop_price": 176.5,
+    "entry_date": "2026-07-17"
   }
 }
