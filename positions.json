@@ -150,5 +150,15 @@
     "entry_price": 183.86,
     "stop_price": 176.5,
     "entry_date": "2026-07-17"
+  },
+  "COP": {
+    "entry_price": 114.71,
+    "stop_price": 109.54,
+    "entry_date": "2026-07-20"
+  },
+  "T": {
+    "entry_price": 21.81,
+    "stop_price": 20.4,
+    "entry_date": "2026-07-20"
   }
 }
