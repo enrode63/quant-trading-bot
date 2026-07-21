@@ -160,5 +160,10 @@
     "entry_price": 21.81,
     "stop_price": 20.4,
     "entry_date": "2026-07-20"
+  },
+  "SPOT": {
+    "entry_price": 492.32,
+    "stop_price": 458.92,
+    "entry_date": "2026-07-21"
   }
 }
