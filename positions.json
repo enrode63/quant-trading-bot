@@ -131,11 +131,6 @@
     "stop_price": 130.85,
     "entry_date": "2026-07-15"
   },
-  "BLK": {
-    "entry_price": 1093.4,
-    "stop_price": 1041.93,
-    "entry_date": "2026-07-16"
-  },
   "MSFT": {
     "entry_price": 401.1,
     "stop_price": 376.12,
@@ -165,5 +160,10 @@
     "entry_price": 492.32,
     "stop_price": 458.92,
     "entry_date": "2026-07-21"
+  },
+  "COIN": {
+    "entry_price": 175.85,
+    "stop_price": 157.21,
+    "entry_date": "2026-07-22"
   }
 }
