@@ -165,5 +165,10 @@
     "entry_price": 175.85,
     "stop_price": 157.21,
     "entry_date": "2026-07-22"
+  },
+  "NVDA": {
+    "entry_price": 212.06,
+    "stop_price": 197.54,
+    "entry_date": "2026-07-23"
   }
 }
