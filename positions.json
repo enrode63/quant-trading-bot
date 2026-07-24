@@ -96,11 +96,6 @@
     "stop_price": 246.56,
     "entry_date": "2026-07-08"
   },
-  "TMUS": {
-    "entry_price": 184.73,
-    "stop_price": 173.12,
-    "entry_date": "2026-07-08"
-  },
   "AAPL": {
     "entry_price": 316.22,
     "stop_price": 298.39,
@@ -109,11 +104,6 @@
   "META": {
     "entry_price": 631.48,
     "stop_price": 585.15,
-    "entry_date": "2026-07-10"
-  },
-  "DDOG": {
-    "entry_price": 269.0,
-    "stop_price": 244.72,
     "entry_date": "2026-07-10"
   },
   "AMZN": {
@@ -170,5 +160,10 @@
     "entry_price": 212.06,
     "stop_price": 197.54,
     "entry_date": "2026-07-23"
+  },
+  "LMT": {
+    "entry_price": 568.59,
+    "stop_price": 541.76,
+    "entry_date": "2026-07-24"
   }
 }
