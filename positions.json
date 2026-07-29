@@ -106,11 +106,6 @@
     "stop_price": 585.15,
     "entry_date": "2026-07-10"
   },
-  "AMZN": {
-    "entry_price": 245.34,
-    "stop_price": 228.79,
-    "entry_date": "2026-07-13"
-  },
   "INTU": {
     "entry_price": 289.76,
     "stop_price": 266.26,
@@ -165,5 +160,15 @@
     "entry_price": 51.53,
     "stop_price": 48.68,
     "entry_date": "2026-07-28"
+  },
+  "NOC": {
+    "entry_price": 549.22,
+    "stop_price": 515.66,
+    "entry_date": "2026-07-29"
+  },
+  "COST": {
+    "entry_price": 966.58,
+    "stop_price": 926.4,
+    "entry_date": "2026-07-29"
   }
 }
