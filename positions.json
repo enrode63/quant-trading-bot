@@ -141,11 +141,6 @@
     "stop_price": 458.92,
     "entry_date": "2026-07-21"
   },
-  "COIN": {
-    "entry_price": 175.85,
-    "stop_price": 157.21,
-    "entry_date": "2026-07-22"
-  },
   "LMT": {
     "entry_price": 568.59,
     "stop_price": 541.76,
@@ -170,5 +165,15 @@
     "entry_price": 115.76,
     "stop_price": 102.7,
     "entry_date": "2026-07-30"
+  },
+  "AMZN": {
+    "entry_price": 271.58,
+    "stop_price": 257.68,
+    "entry_date": "2026-08-03"
+  },
+  "DDOG": {
+    "entry_price": 267.97,
+    "stop_price": 241.53,
+    "entry_date": "2026-08-03"
   }
 }
