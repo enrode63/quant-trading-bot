@@ -185,5 +185,20 @@
     "entry_price": 1126.63,
     "stop_price": 1063.9,
     "entry_date": "2026-08-04"
+  },
+  "PLTR": {
+    "entry_price": 162.66,
+    "stop_price": 150.82,
+    "entry_date": "2026-08-05"
+  },
+  "AVGO": {
+    "entry_price": 418.16,
+    "stop_price": 385.83,
+    "entry_date": "2026-08-05"
+  },
+  "ORCL": {
+    "entry_price": 145.74,
+    "stop_price": 130.87,
+    "entry_date": "2026-08-05"
   }
 }
