@@ -200,5 +200,10 @@
     "entry_price": 219.22,
     "stop_price": 203.72,
     "entry_date": "2026-08-06"
+  },
+  "MSTR": {
+    "entry_price": 100.01,
+    "stop_price": 88.97,
+    "entry_date": "2026-08-10"
   }
 }
