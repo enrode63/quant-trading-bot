@@ -181,11 +181,6 @@
     "stop_price": 150.82,
     "entry_date": "2026-08-05"
   },
-  "AVGO": {
-    "entry_price": 418.16,
-    "stop_price": 385.83,
-    "entry_date": "2026-08-05"
-  },
   "ORCL": {
     "entry_price": 145.74,
     "stop_price": 130.87,
