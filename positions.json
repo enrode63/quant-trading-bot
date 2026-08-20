@@ -200,5 +200,10 @@
     "entry_price": 45.2,
     "stop_price": 39.21,
     "entry_date": "2026-08-13"
+  },
+  "WMT": {
+    "entry_price": 114.3,
+    "stop_price": 109.63,
+    "entry_date": "2026-08-20"
   }
 }
