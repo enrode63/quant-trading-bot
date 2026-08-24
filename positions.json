@@ -205,5 +205,10 @@
     "entry_price": 172.35,
     "stop_price": 154.62,
     "entry_date": "2026-08-21"
+  },
+  "TSLA": {
+    "entry_price": 362.86,
+    "stop_price": 340.86,
+    "entry_date": "2026-08-24"
   }
 }
