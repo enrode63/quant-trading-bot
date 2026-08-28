@@ -161,11 +161,6 @@
     "stop_price": 102.7,
     "entry_date": "2026-07-30"
   },
-  "AMZN": {
-    "entry_price": 271.58,
-    "stop_price": 257.68,
-    "entry_date": "2026-08-03"
-  },
   "BLK": {
     "entry_price": 1126.63,
     "stop_price": 1063.9,
