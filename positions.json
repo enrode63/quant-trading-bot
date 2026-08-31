@@ -186,11 +186,6 @@
     "stop_price": 88.97,
     "entry_date": "2026-08-10"
   },
-  "IONQ": {
-    "entry_price": 45.2,
-    "stop_price": 39.21,
-    "entry_date": "2026-08-13"
-  },
   "COIN": {
     "entry_price": 172.35,
     "stop_price": 154.62,
