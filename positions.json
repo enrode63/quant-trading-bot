@@ -195,5 +195,10 @@
     "entry_price": 362.86,
     "stop_price": 340.86,
     "entry_date": "2026-08-24"
+  },
+  "QCOM": {
+    "entry_price": 170.48,
+    "stop_price": 160.88,
+    "entry_date": "2026-09-01"
   }
 }
