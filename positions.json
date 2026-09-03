@@ -91,11 +91,6 @@
     "entry_price": 193.18,
     "entry_date": "2026-07-02"
   },
-  "NET": {
-    "entry_price": 268.83,
-    "stop_price": 246.56,
-    "entry_date": "2026-07-08"
-  },
   "AAPL": {
     "entry_price": 316.22,
     "stop_price": 298.39,
@@ -146,20 +141,10 @@
     "stop_price": 48.68,
     "entry_date": "2026-07-28"
   },
-  "COST": {
-    "entry_price": 966.58,
-    "stop_price": 926.4,
-    "entry_date": "2026-07-29"
-  },
   "NOW": {
     "entry_price": 115.76,
     "stop_price": 102.7,
     "entry_date": "2026-07-30"
-  },
-  "BLK": {
-    "entry_price": 1126.63,
-    "stop_price": 1063.9,
-    "entry_date": "2026-08-04"
   },
   "PLTR": {
     "entry_price": 162.66,
@@ -195,5 +180,10 @@
     "entry_price": 170.48,
     "stop_price": 160.88,
     "entry_date": "2026-09-01"
+  },
+  "TMUS": {
+    "entry_price": 187.3,
+    "stop_price": 179.37,
+    "entry_date": "2026-09-03"
   }
 }
