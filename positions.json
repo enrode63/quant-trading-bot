@@ -176,11 +176,6 @@
     "stop_price": 160.88,
     "entry_date": "2026-09-01"
   },
-  "TMUS": {
-    "entry_price": 187.3,
-    "stop_price": 179.37,
-    "entry_date": "2026-09-03"
-  },
   "META": {
     "entry_price": 610.68,
     "stop_price": 573.39,
