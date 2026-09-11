@@ -141,11 +141,6 @@
     "stop_price": 102.7,
     "entry_date": "2026-07-30"
   },
-  "PLTR": {
-    "entry_price": 162.66,
-    "stop_price": 150.82,
-    "entry_date": "2026-08-05"
-  },
   "ORCL": {
     "entry_price": 145.74,
     "stop_price": 130.87,
