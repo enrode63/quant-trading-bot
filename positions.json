@@ -175,5 +175,10 @@
     "entry_price": 610.68,
     "stop_price": 573.39,
     "entry_date": "2026-09-04"
+  },
+  "NET": {
+    "entry_price": 330.36,
+    "stop_price": 297.79,
+    "entry_date": "2026-09-15"
   }
 }
