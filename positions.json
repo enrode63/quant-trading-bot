@@ -175,5 +175,10 @@
     "entry_price": 330.36,
     "stop_price": 297.79,
     "entry_date": "2026-09-15"
+  },
+  "GOOGL": {
+    "entry_price": 349.54,
+    "stop_price": 333.68,
+    "entry_date": "2026-09-21"
   }
 }
