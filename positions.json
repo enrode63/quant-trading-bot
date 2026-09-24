@@ -165,5 +165,25 @@
     "entry_price": 349.54,
     "stop_price": 333.68,
     "entry_date": "2026-09-21"
+  },
+  "PLTR": {
+    "entry_price": 191.79,
+    "stop_price": 177.68,
+    "entry_date": "2026-09-24"
+  },
+  "DDOG": {
+    "entry_price": 251.49,
+    "stop_price": 228.7,
+    "entry_date": "2026-09-24"
+  },
+  "WMT": {
+    "entry_price": 110.53,
+    "stop_price": 106.91,
+    "entry_date": "2026-09-24"
+  },
+  "IONQ": {
+    "entry_price": 42.54,
+    "stop_price": 37.98,
+    "entry_date": "2026-09-24"
   }
 }
