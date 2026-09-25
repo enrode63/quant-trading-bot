@@ -121,11 +121,6 @@
     "stop_price": 102.7,
     "entry_date": "2026-07-30"
   },
-  "ORCL": {
-    "entry_price": 145.74,
-    "stop_price": 130.87,
-    "entry_date": "2026-08-05"
-  },
   "NVDA": {
     "entry_price": 219.22,
     "stop_price": 203.72,
