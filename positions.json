@@ -160,5 +160,15 @@
     "entry_price": 42.54,
     "stop_price": 37.98,
     "entry_date": "2026-09-24"
+  },
+  "AVGO": {
+    "entry_price": 375.81,
+    "stop_price": 356.0,
+    "entry_date": "2026-10-07"
+  },
+  "COST": {
+    "entry_price": 935.68,
+    "stop_price": 906.6,
+    "entry_date": "2026-10-07"
   }
 }
