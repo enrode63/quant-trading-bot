@@ -175,5 +175,15 @@
     "entry_price": 259.92,
     "stop_price": 249.37,
     "entry_date": "2026-10-08"
+  },
+  "TSLA": {
+    "entry_price": 382.7,
+    "stop_price": 360.57,
+    "entry_date": "2026-10-12"
+  },
+  "WMT": {
+    "entry_price": 111.35,
+    "stop_price": 106.73,
+    "entry_date": "2026-10-12"
   }
 }
