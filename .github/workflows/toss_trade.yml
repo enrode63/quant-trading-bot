@@ -25,7 +25,6 @@ jobs:
           TOSS_CLIENT_ID: ${{ secrets.TOSS_CLIENT_ID }}
           TOSS_CLIENT_SECRET: ${{ secrets.TOSS_CLIENT_SECRET }}
           TOSS_ACCOUNT_SEQ: ${{ vars.TOSS_ACCOUNT_SEQ }}
-          TOSS_BUYING_POWER_PCT: ${{ vars.TOSS_BUYING_POWER_PCT }}
           TOSS_MAX_USD_PER_TRADE: ${{ vars.TOSS_MAX_USD_PER_TRADE }}
           TOSS_MAX_POSITIONS: ${{ vars.TOSS_MAX_POSITIONS }}
           TOSS_MAX_ORDERS_PER_RUN: ${{ vars.TOSS_MAX_ORDERS_PER_RUN }}

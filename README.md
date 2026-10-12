@@ -22,12 +22,10 @@ Required environment variables:
 | --- | --- |
 | `TOSS_CLIENT_ID`, `TOSS_CLIENT_SECRET` | Open API credentials |
 | `TOSS_ACCOUNT_SEQ` | Brokerage account sequence, not the account number |
-| `TOSS_BUYING_POWER_PCT` | Fraction of starting USD cash buying power allocated per new symbol, e.g. `0.05` for 5% |
-| `TOSS_MAX_POSITIONS` | Maximum simultaneous US holdings before new buys are skipped |
 | `TOSS_MAX_ORDERS_PER_RUN` | Maximum orders in one run |
 | `TOSS_STATE_FILE` | Persistent, private file path outside a Git checkout |
 
-Optional `TOSS_MAX_USD_PER_TRADE` places a further dollar cap on each buy. The runner uses the smaller of this cap and `buying power × TOSS_BUYING_POWER_PCT`, then checks the current remaining USD buying power. Toss Open API does not automatically exchange KRW into USD; the account needs enough USD. For live mode, add `TOSS_LIVE_TRADING=YES` **and** the `--live` CLI flag.
+Each new buy receives a target budget of **remaining USD cash buying power ÷ (55 watched symbols − currently held watched US symbols)**. The watched list currently has 55 names; US holdings outside that list do not reduce the slot count. Open buy orders in the list reserve a slot too. The budget and slot count are recalculated after each proposed/submitted buy. Whole-share rounding may leave cash unused. Optional `TOSS_MAX_USD_PER_TRADE` adds a dollar cap, and optional `TOSS_MAX_POSITIONS` adds a lower position cap (by default all 55 slots are available). Setting a lower position cap will leave some USD unallocated. Toss Open API does not automatically exchange KRW into USD; the account needs enough USD. For live mode, add `TOSS_LIVE_TRADING=YES` **and** the `--live` CLI flag.
 
 ```bash
 python -m pip install -r requirements.txt

@@ -71,7 +71,6 @@ class TraderTests(unittest.TestCase):
             patch.dict(
                 os.environ,
                 {
-                    "TOSS_BUYING_POWER_PCT": "0.10",
                     "TOSS_MAX_POSITIONS": "3",
                     "TOSS_MAX_ORDERS_PER_RUN": "2",
                     "TOSS_LIVE_TRADING": "YES",
@@ -89,10 +88,10 @@ class TraderTests(unittest.TestCase):
         self.assertEqual(client.orders, [])
         self.assertEqual(self.state_path.read_text(encoding="utf-8"), original)
 
-    def test_live_uses_account_percentage_and_deduplicates(self):
+    def test_live_uses_remaining_slots_and_deduplicates(self):
         client = FakeClient()
         toss_trader.run(True, client=client, now=NOW)
-        self.assertEqual(client.orders, [("AAPL", "BUY", 5, "20", "turtle-20261012-AAPL-buy")])
+        self.assertEqual(client.orders, [("AAPL", "BUY", 49, "20", "turtle-20261012-AAPL-buy")])
         toss_trader.run(True, client=client, now=NOW)
         self.assertEqual(len(client.orders), 1)
 
@@ -110,10 +109,33 @@ class TraderTests(unittest.TestCase):
         toss_trader.run(True, client=client, now=NOW)
         self.assertEqual(client.orders, [])
 
-    def test_invalid_account_percentage_rejected(self):
-        with patch.dict(os.environ, {"TOSS_BUYING_POWER_PCT": "1.5"}):
-            with self.assertRaises(ValueError):
-                toss_trader.position_budget(Decimal("100"))
+    def test_remaining_slot_budget_and_zero_slots(self):
+        self.assertEqual(toss_trader.position_budget(Decimal("550"), 55), Decimal("10"))
+        self.assertEqual(toss_trader.position_budget(Decimal("520"), 52), Decimal("10"))
+        self.assertEqual(toss_trader.position_budget(Decimal("100"), 0), Decimal("0"))
+
+    def test_us_holding_outside_watchlist_does_not_reduce_slots(self):
+        client = FakeClient()
+        client.holdings = lambda: [{
+            "symbol": "TSLA", "quantity": "2", "marketCountry": "US", "currency": "USD"
+        }]
+        watchlist = {"AAPL": "tech", "MSFT": "tech", "NVDA": "tech"}
+        with patch.object(toss_trader, "SYMBOLS", watchlist), patch.object(
+            toss_trader, "latest_closed_signal",
+            side_effect=lambda client, symbol, now: ("2026-10-12", SIGNAL) if symbol == "AAPL" else None,
+        ):
+            toss_trader.run(True, client=client, now=NOW)
+        self.assertEqual(client.orders[0][2], 16)  # floor((1000 / 3) / 20)
+
+    def test_each_buy_recalculates_cash_per_remaining_slot(self):
+        client = FakeClient()
+        watchlist = {"AAPL": "tech", "MSFT": "tech", "NVDA": "tech"}
+        with patch.object(toss_trader, "SYMBOLS", watchlist), patch.object(
+            toss_trader, "latest_closed_signal",
+            side_effect=lambda client, symbol, now: ("2026-10-12", SIGNAL) if symbol != "NVDA" else None,
+        ):
+            toss_trader.run(True, client=client, now=NOW)
+        self.assertEqual([(o[0], o[2]) for o in client.orders], [("AAPL", 16), ("MSFT", 17)])
 
     def test_sell_is_capped_to_strategy_managed_shares(self):
         self.state_path.write_text(

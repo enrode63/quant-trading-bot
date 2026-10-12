@@ -34,11 +34,10 @@ def positive_decimal(name: str) -> Decimal:
     return value
 
 
-def position_budget(available_cash: Decimal) -> Decimal:
-    ratio = positive_decimal("TOSS_BUYING_POWER_PCT")
-    if ratio > 1:
-        raise ValueError("TOSS_BUYING_POWER_PCT must be at most 1")
-    budget = available_cash * ratio
+def position_budget(available_cash: Decimal, remaining_slots: int) -> Decimal:
+    if remaining_slots < 1:
+        return Decimal(0)
+    budget = available_cash / remaining_slots
     if os.environ.get("TOSS_MAX_USD_PER_TRADE"):
         budget = min(budget, positive_decimal("TOSS_MAX_USD_PER_TRADE"))
     return budget
@@ -213,7 +212,11 @@ def run(live: bool, *, client=None, now=None):
         raise ValueError("Live mode requires an existing absolute TOSS_STATE_FILE")
     if live and STATE_PATH.resolve().is_relative_to(Path(__file__).resolve().parent):
         raise ValueError("Live state file must be outside the Git checkout")
-    max_positions = positive_int("TOSS_MAX_POSITIONS")
+    max_positions = (
+        positive_int("TOSS_MAX_POSITIONS")
+        if os.environ.get("TOSS_MAX_POSITIONS")
+        else len(SYMBOLS)
+    )
     max_orders = positive_int("TOSS_MAX_ORDERS_PER_RUN")
     if client is None:
         client = TossClient(
@@ -268,9 +271,16 @@ def run(live: bool, *, client=None, now=None):
             print(f"SKIP {symbol}: signal error: {exc}")
     candidates.sort()
     order_count = 0
-    held_count = sum(quantity > 0 for quantity in holdings.values())
+    occupied_symbols = {
+        symbol for symbol, quantity in holdings.items() if symbol in SYMBOLS and quantity > 0
+    }
+    occupied_symbols.update(
+        order["symbol"]
+        for order in open_orders
+        if order.get("side") == "BUY" and order["symbol"] in SYMBOLS
+    )
+    held_count = len(occupied_symbols)
     cash = Decimal(client.buying_power_usd())
-    budget = position_budget(cash)
     for _, _, symbol, side, signal_date, signal in candidates:
         if order_count >= max_orders:
             break
@@ -283,6 +293,9 @@ def run(live: bool, *, client=None, now=None):
         try:
             price = quote_price(client, symbol, side, quote_now)
             if side == "BUY":
+                budget = position_budget(cash, len(SYMBOLS) - held_count)
+                if budget <= 0:
+                    continue
                 quantity = int((min(budget, cash * Decimal("0.99")) / price).to_integral_value(rounding=ROUND_DOWN))
                 if quantity < 1:
                     continue
