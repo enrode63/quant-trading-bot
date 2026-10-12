@@ -1,0 +1,39 @@
+name: Toss US stock trader
+
+on:
+  schedule:
+    # 09:45 New York: 13:45 UTC in summer, 14:45 UTC in winter.
+    - cron: "45 13,14 * * 1-5"
+  workflow_dispatch:
+
+concurrency:
+  group: toss-us-trader
+  cancel-in-progress: false
+
+jobs:
+  trade:
+    runs-on: self-hosted
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+      - name: Run Toss trader
+        env:
+          TOSS_CLIENT_ID: ${{ secrets.TOSS_CLIENT_ID }}
+          TOSS_CLIENT_SECRET: ${{ secrets.TOSS_CLIENT_SECRET }}
+          TOSS_ACCOUNT_SEQ: ${{ vars.TOSS_ACCOUNT_SEQ }}
+          TOSS_BUYING_POWER_PCT: ${{ vars.TOSS_BUYING_POWER_PCT }}
+          TOSS_MAX_USD_PER_TRADE: ${{ vars.TOSS_MAX_USD_PER_TRADE }}
+          TOSS_MAX_POSITIONS: ${{ vars.TOSS_MAX_POSITIONS }}
+          TOSS_MAX_ORDERS_PER_RUN: ${{ vars.TOSS_MAX_ORDERS_PER_RUN }}
+          TOSS_LIVE_TRADING: ${{ vars.TOSS_LIVE_TRADING }}
+          TOSS_STATE_FILE: /var/lib/toss-trader/state.json
+        run: |
+          if [ "$TOSS_LIVE_TRADING" = YES ]; then
+            python toss_trader.py --live
+          else
+            python toss_trader.py
+          fi

@@ -1,0 +1,6 @@
+__pycache__/
+.pytest_cache/
+.venv/
+.env
+toss_state.json
+toss_state.json.tmp

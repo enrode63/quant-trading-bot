@@ -181,12 +181,16 @@ def build_msg1(date_str, entry_signals):
 
 
 def build_msg2(date_str, exit_list, stop_list):
-    """메시지 2 — 익절 + 손절 합산"""
+    """메시지 2 — 20일 저점 이탈은 진입가 대비 손익으로 분류."""
     lines = [f"📅 **{date_str}**\n"]
 
-    if exit_list:
+    profitable_exits = [e for e in exit_list if e["sig"]["price"] > e["entry_price"]]
+    losing_exits = [e for e in exit_list if e["sig"]["price"] < e["entry_price"]]
+    even_exits = [e for e in exit_list if e["sig"]["price"] == e["entry_price"]]
+
+    if profitable_exits:
         lines.append("💰 **익절**\n")
-        for e in exit_list:
+        for e in profitable_exits:
             s, sec, sig, entry_price = e["symbol"], e["sector"], e["sig"], e["entry_price"]
             name = NAMES.get(s, s)
             pnl = round((sig['price'] - entry_price) / entry_price * 100, 2)
@@ -195,22 +199,30 @@ def build_msg2(date_str, exit_list, stop_list):
                 f"✅ {name} ({s} · {sec})\n"
                 f"　- 진입가 : ${entry_price}\n"
                 f"　- 익절가 : ${sig['price']}\n"
-                f"　- 수익률 : {sign}{pnl}%\n"
+                f"　- 예상 수익률 : {sign}{pnl}%\n"
                 f"{'─'*24}"
             )
 
-    if stop_list:
+    if even_exits:
+        lines.append("➖ **본전 청산**\n")
+        for e in even_exits:
+            s, sec, sig = e["symbol"], e["sector"], e["sig"]
+            lines.append(f"🔹 {NAMES.get(s, s)} ({s} · {sec})\n　- 기준가 : ${sig['price']}\n{'─'*24}")
+
+    if losing_exits or stop_list:
         lines.append("🛑 **손절**\n")
-        for e in stop_list:
+        for e in losing_exits + stop_list:
             s, sec, sig, entry_price = e["symbol"], e["sector"], e["sig"], e["entry_price"]
-            stop_price = e.get("stop_price", sig["stop"])
+            reason = "ATR 손절가 도달" if "stop_price" in e else "20일 저점 이탈"
             name = NAMES.get(s, s)
             pnl = round((sig['price'] - entry_price) / entry_price * 100, 2)
+            stop_line = f"　- 손절 기준가 : ${e['stop_price']}\n" if "stop_price" in e else ""
             lines.append(
                 f"❌ {name} ({s} · {sec})\n"
                 f"　- 진입가 : ${entry_price}\n"
-                f"　- 손절가 : ${stop_price}\n"
-                f"　- 수익률 : {pnl}%\n"
+                f"　- 사유 : {reason}\n"
+                f"{stop_line}"
+                f"　- 예상 수익률 : {pnl}%\n"
                 f"{'─'*24}"
             )
 
