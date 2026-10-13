@@ -73,12 +73,15 @@ class TossClient:
         return payload["result"]
 
     def validate_account(self):
-        accounts = self._request("GET", "/api/v1/accounts", account=False)
+        accounts = self.accounts()
         if not any(
             int(a["accountSeq"]) == self.account_seq and a.get("accountType") == "BROKERAGE"
             for a in accounts
         ):
             raise TossAPIError("Configured account is not an available brokerage account")
+
+    def accounts(self):
+        return self._request("GET", "/api/v1/accounts", account=False)
 
     def holdings(self):
         return self._request("GET", "/api/v1/holdings")["items"]

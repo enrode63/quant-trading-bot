@@ -16,6 +16,31 @@ The strategy was originally an alert script. The existing `positions.json` conta
 
 Use Python 3.11+ and install `requirements.txt`. In the [Toss Securities WTS Open API settings](https://developers.tossinvest.com/docs), create a client ID and secret, register the runner's **fixed public IP**, and find your `accountSeq` using the account API. Keep credentials in environment variables or a secret store, never in the repository or Discord.
 
+### First connection on Windows (PowerShell)
+
+Register **this PC's public IP** in the Toss WTS Open API settings before the local check. If the automatic runner is on another machine, register that machine's public IP too. From this repository directory:
+
+```powershell
+python -m pip install -r requirements.txt
+$env:TOSS_CLIENT_ID = Read-Host 'Toss client ID'
+$secureSecret = Read-Host 'Toss client secret' -AsSecureString
+$env:TOSS_CLIENT_SECRET = [System.Net.NetworkCredential]::new('', $secureSecret).Password
+python toss_setup.py
+```
+
+`toss_setup.py` only fetches the brokerage `accountSeq` values. It neither places orders nor saves the credentials. Choose the displayed sequence and continue in the same PowerShell window:
+
+```powershell
+$env:TOSS_ACCOUNT_SEQ = '1'  # Replace 1 with the displayed accountSeq
+$env:TOSS_MAX_ORDERS_PER_RUN = '1'
+$env:TOSS_STATE_FILE = Join-Path $env:USERPROFILE 'toss-trader-state.json'
+python toss_setup.py --account-seq $env:TOSS_ACCOUNT_SEQ  # Read-only balance check
+python toss_trader.py --init-state                         # Once, creates private order state
+python toss_trader.py                                      # Read-only order preview
+```
+
+Closing the PowerShell window removes these session environment variables. Keep the secret out of GitHub variables and files. For automation, put credentials in GitHub **Secrets** and use a fixed-IP self-hosted runner.
+
 Required environment variables:
 
 | Name | Meaning |

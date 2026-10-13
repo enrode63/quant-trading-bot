@@ -213,6 +213,32 @@ class TraderTests(unittest.TestCase):
         self.assertEqual(args["json"]["quantity"], "2")
         self.assertEqual(args["json"]["price"], "20.01")
 
+    def test_account_lookup_uses_bearer_without_account_header(self):
+        class Response:
+            status_code = 200
+            headers = {}
+
+            def __init__(self, payload):
+                self.payload = payload
+
+            def json(self):
+                return self.payload
+
+        class Session:
+            def post(self, url, **kwargs):
+                return Response({"access_token": "test-token", "expires_in": 86400})
+
+            def request(self, method, url, **kwargs):
+                self.request_args = (method, url, kwargs)
+                return Response({"result": [{"accountSeq": 3, "accountType": "BROKERAGE"}]})
+
+        session = Session()
+        accounts = TossClient("id", "secret", 1, session=session).accounts()
+        self.assertEqual(accounts[0]["accountSeq"], 3)
+        method, url, kwargs = session.request_args
+        self.assertEqual((method, url), ("GET", "https://openapi.tossinvest.com/api/v1/accounts"))
+        self.assertNotIn("X-Tossinvest-Account", kwargs["headers"])
+
 
 if __name__ == "__main__":
     unittest.main()
