@@ -1,0 +1,22 @@
+{
+  "symbols": [
+    "QQQ",
+    "SPY",
+    "DIA"
+  ],
+  "dow_proxy": "DIA ETF, not the untradeable ^DJI index",
+  "fractional_quantity": [],
+  "fractional_precision": 8,
+  "price_source": "Yahoo Finance adjusted daily OHLC",
+  "start_inclusive": "2021-01-01",
+  "end_exclusive": "2026-10-13",
+  "initial_cash_usd": 100000,
+  "one_way_friction_rate": 0.001,
+  "entry": "daily high > prior 20-day high; next daily open fill; ADX priority",
+  "fixed_stop": "signal close - 2 * prior simple ATR(14); fixed; close trigger; next daily open fill",
+  "existing_exit": "daily low < prior 20-day low; next daily open fill",
+  "chandelier_exit": "daily low < max since entry of (prior 22-day high - multiplier * prior simple ATR(22)); next daily open fill",
+  "sizing": "remaining USD / (number of assets - held asset count); ETFs whole shares, crypto eight decimal places if included",
+  "calendar": "ETFs trade on US stock sessions; spot crypto trades every calendar day if included",
+  "open_positions": "marked at latest available adjusted close"
+}

@@ -1,4 +1,4 @@
-"""Run the six exit variants on SPY, QQQ, DIA, BTC-USD, and ETH-USD."""
+"""Run the six exit variants on a selected ETF/crypto basket."""
 
 from __future__ import annotations
 
@@ -27,22 +27,26 @@ def main() -> None:
     )
     parser.add_argument("--cash", type=float, default=100_000)
     parser.add_argument("--friction", type=float, default=0.001)
+    parser.add_argument("--assets", nargs="+", choices=ASSETS, default=list(ASSETS))
     parser.add_argument("--output", type=Path, default=Path("backtest_results_cross_asset"))
     args = parser.parse_args()
     if args.cash <= 0 or not 0 <= args.friction < 1:
         parser.error("cash must be positive and friction must be in [0, 1)")
+    if len(set(args.assets)) != len(args.assets):
+        parser.error("assets must be unique")
 
-    prices = load_prices(args.start, args.end, ASSETS)
+    prices = load_prices(args.start, args.end, args.assets)
+    fractional = FRACTIONAL.intersection(args.assets)
     args.output.mkdir(parents=True, exist_ok=True)
     basket_rows, asset_rows, basket_trades = [], [], []
     for kind, multiple in VARIANTS:
-        summary, trades, curve = simulate(prices, kind, multiple, args.cash, args.friction, FRACTIONAL)
+        summary, trades, curve = simulate(prices, kind, multiple, args.cash, args.friction, fractional)
         basket_rows.append(summary)
         basket_trades.extend({"variant": summary["variant"], **trade} for trade in trades)
         curve.to_csv(args.output / f"basket_{summary['variant']}_equity.csv")
         for symbol, frame in prices.items():
             single, _, _ = simulate(
-                {symbol: frame}, kind, multiple, args.cash, args.friction, FRACTIONAL,
+                {symbol: frame}, kind, multiple, args.cash, args.friction, fractional,
             )
             asset_rows.append({"asset": symbol, **single})
     pd.DataFrame(basket_rows).to_csv(args.output / "basket_summary.csv", index=False)
@@ -59,9 +63,9 @@ def main() -> None:
     ])
     buyhold.to_csv(args.output / "buy_hold.csv", index=False)
     (args.output / "assumptions.json").write_text(json.dumps({
-        "symbols": ASSETS,
-        "dow_proxy": "DIA ETF, not the untradeable ^DJI index",
-        "fractional_quantity": sorted(FRACTIONAL),
+        "symbols": args.assets,
+        "dow_proxy": "DIA ETF, not the untradeable ^DJI index" if "DIA" in args.assets else None,
+        "fractional_quantity": sorted(fractional),
         "fractional_precision": 8,
         "price_source": "Yahoo Finance adjusted daily OHLC",
         "start_inclusive": args.start,
@@ -72,8 +76,8 @@ def main() -> None:
         "fixed_stop": "signal close - 2 * prior simple ATR(14); fixed; close trigger; next daily open fill",
         "existing_exit": "daily low < prior 20-day low; next daily open fill",
         "chandelier_exit": "daily low < max since entry of (prior 22-day high - multiplier * prior simple ATR(22)); next daily open fill",
-        "sizing": "remaining USD / (number of assets - held asset count); ETFs whole shares, crypto eight decimal places",
-        "calendar": "ETFs trade on US stock sessions; spot crypto trades every calendar day; mixed basket is illustrative",
+        "sizing": "remaining USD / (number of assets - held asset count); ETFs whole shares, crypto eight decimal places if included",
+        "calendar": "ETFs trade on US stock sessions; spot crypto trades every calendar day if included",
         "open_positions": "marked at latest available adjusted close",
     }, indent=2), encoding="utf-8")
     print("BASKET")
