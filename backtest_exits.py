@@ -10,7 +10,8 @@ import argparse
 import json
 import math
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
+from decimal import Decimal, ROUND_DOWN, ROUND_HALF_UP
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -26,7 +27,24 @@ class Position:
     entry_date: str
     entry_price: float
     stop: float
+    entry_fee: float = 0.0
     trailing_exit: float = float("-inf")
+
+
+def toss_commission(gross: float) -> float:
+    """Standard US stock commission: 0.1%, cent-truncated, waived up to $10."""
+    amount = Decimal(str(gross))
+    if amount <= Decimal("10"):
+        return 0.0
+    return float((amount * Decimal("0.001")).quantize(Decimal("0.01"), rounding=ROUND_DOWN))
+
+
+def toss_sec_fee(gross: float, trade_date: pd.Timestamp) -> float:
+    """Customer-paid sell-side SEC fee from 2026-04-02 per Toss's fee page."""
+    if trade_date.date() < date(2026, 4, 2):
+        return 0.0
+    amount = max(Decimal("0.01"), Decimal(str(gross)) * Decimal("0.0000206"))
+    return float(amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
 
 
 def load_prices(start: str, end: str, symbols=None) -> dict[str, pd.DataFrame]:
@@ -64,8 +82,10 @@ def load_prices(start: str, end: str, symbols=None) -> dict[str, pd.DataFrame]:
 
 def simulate(
     prices: dict[str, pd.DataFrame], kind: str, multiplier: int | None,
-    initial_cash: float, friction: float, fractional_symbols=frozenset(),
+    initial_cash: float, friction: float, fractional_symbols=frozenset(), toss_fees: bool = False,
 ) -> tuple[dict, list[dict], pd.DataFrame]:
+    if toss_fees and fractional_symbols:
+        raise ValueError("Toss US stock fees cannot be applied to spot crypto")
     dates = sorted(set().union(*(frame.index for frame in prices.values())))
     cash = initial_cash
     held: dict[str, Position] = {}
@@ -74,6 +94,8 @@ def simulate(
     last_close: dict[str, float] = {}
     trades = []
     curve = []
+    broker_fees_paid = 0.0
+    sec_fees_paid = 0.0
     for date in dates:
         bars = {symbol: frame.loc[date] for symbol, frame in prices.items() if date in frame.index}
         for symbol, reason in list(pending_sells.items()):
@@ -81,12 +103,20 @@ def simulate(
                 continue
             position = held.pop(symbol)
             price = float(bars[symbol]["open"])
-            cash += position.quantity * price * (1 - friction)
+            gross = position.quantity * price
+            sell_fee = toss_commission(gross) if toss_fees else gross * friction
+            sec_fee = toss_sec_fee(gross, date) if toss_fees else 0.0
+            cash += gross - sell_fee - sec_fee
+            broker_fees_paid += sell_fee
+            sec_fees_paid += sec_fee
             trades.append({
                 "symbol": symbol, "entry_date": position.entry_date,
                 "exit_date": date.strftime("%Y-%m-%d"), "entry_price": position.entry_price,
                 "exit_price": price, "quantity": position.quantity, "reason": reason,
-                "return_pct": 100 * (price * (1 - friction) / (position.entry_price * (1 + friction)) - 1),
+                "buy_fee": position.entry_fee, "sell_fee": sell_fee, "sec_fee": sec_fee,
+                "return_pct": 100 * ((gross - sell_fee - sec_fee) / (
+                    position.quantity * position.entry_price + position.entry_fee
+                ) - 1),
             })
             del pending_sells[symbol]
         for symbol, (stop, adx) in sorted(pending_buys.items(), key=lambda item: -item[1][1]):
@@ -96,12 +126,19 @@ def simulate(
             if slots <= 0:
                 break
             price = float(bars[symbol]["open"])
-            affordable = (cash / slots) / (price * (1 + friction))
+            budget = cash / slots
+            affordable = budget / price if toss_fees else budget / (price * (1 + friction))
             quantity = math.floor(affordable * 1e8) / 1e8 if symbol in fractional_symbols else math.floor(affordable)
+            if toss_fees:
+                while quantity > 0 and quantity * price + toss_commission(quantity * price) > budget:
+                    quantity -= 1
             if quantity <= 0:
                 continue
-            cash -= quantity * price * (1 + friction)
-            held[symbol] = Position(quantity, date.strftime("%Y-%m-%d"), price, stop)
+            gross = quantity * price
+            buy_fee = toss_commission(gross) if toss_fees else gross * friction
+            cash -= gross + buy_fee
+            broker_fees_paid += buy_fee
+            held[symbol] = Position(quantity, date.strftime("%Y-%m-%d"), price, stop, buy_fee)
         pending_buys = {}
         for symbol, bar in bars.items():
             last_close[symbol] = float(bar["close"])
@@ -140,6 +177,8 @@ def simulate(
         "win_rate_pct": round(100 * sum(t["return_pct"] > 0 for t in trades) / len(trades), 2) if trades else None,
         "mean_trade_pct": round(sum(t["return_pct"] for t in trades) / len(trades), 2) if trades else None,
         "open_positions": len(held),
+        "broker_commissions_usd": round(broker_fees_paid, 2),
+        "sec_fees_usd": round(sec_fees_paid, 2),
     }
     return summary, trades, daily
 

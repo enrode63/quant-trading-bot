@@ -27,6 +27,7 @@ def main() -> None:
     )
     parser.add_argument("--cash", type=float, default=100_000)
     parser.add_argument("--friction", type=float, default=0.001)
+    parser.add_argument("--toss-fees", action="store_true", help="use standard Toss US stock commissions and dated SEC sell fees")
     parser.add_argument("--assets", nargs="+", choices=ASSETS, default=list(ASSETS))
     parser.add_argument("--output", type=Path, default=Path("backtest_results_cross_asset"))
     args = parser.parse_args()
@@ -37,19 +38,34 @@ def main() -> None:
 
     prices = load_prices(args.start, args.end, args.assets)
     fractional = FRACTIONAL.intersection(args.assets)
+    if args.toss_fees and fractional:
+        parser.error("--toss-fees is for US stocks/ETFs; remove BTC-USD and ETH-USD")
     args.output.mkdir(parents=True, exist_ok=True)
-    basket_rows, asset_rows, basket_trades = [], [], []
+    basket_rows, asset_rows, basket_trades, cost_comparison = [], [], [], []
     for kind, multiple in VARIANTS:
-        summary, trades, curve = simulate(prices, kind, multiple, args.cash, args.friction, fractional)
+        summary, trades, curve = simulate(
+            prices, kind, multiple, args.cash, args.friction, fractional, toss_fees=args.toss_fees,
+        )
         basket_rows.append(summary)
         basket_trades.extend({"variant": summary["variant"], **trade} for trade in trades)
         curve.to_csv(args.output / f"basket_{summary['variant']}_equity.csv")
+        if args.toss_fees:
+            old, _, _ = simulate(prices, kind, multiple, args.cash, args.friction, fractional)
+            cost_comparison.append({
+                "variant": summary["variant"],
+                "uniform_cost_return_pct": old["total_return_pct"],
+                "toss_fee_return_pct": summary["total_return_pct"],
+                "difference_pct_points": round(summary["total_return_pct"] - old["total_return_pct"], 2),
+            })
         for symbol, frame in prices.items():
             single, _, _ = simulate(
                 {symbol: frame}, kind, multiple, args.cash, args.friction, fractional,
+                toss_fees=args.toss_fees,
             )
             asset_rows.append({"asset": symbol, **single})
     pd.DataFrame(basket_rows).to_csv(args.output / "basket_summary.csv", index=False)
+    if cost_comparison:
+        pd.DataFrame(cost_comparison).to_csv(args.output / "cost_comparison.csv", index=False)
     pd.DataFrame(asset_rows).to_csv(args.output / "per_asset_summary.csv", index=False)
     pd.DataFrame(basket_trades).to_csv(args.output / "basket_trades.csv", index=False)
     buyhold = pd.DataFrame([
@@ -71,7 +87,12 @@ def main() -> None:
         "start_inclusive": args.start,
         "end_exclusive": args.end,
         "initial_cash_usd": args.cash,
-        "one_way_friction_rate": args.friction,
+        "one_way_friction_rate": 0 if args.toss_fees else args.friction,
+        "fee_model": (
+            "Toss standard US stock commission: 0.1% each side, truncate below $0.01, waive order gross <= $10; "
+            "SEC sell fee from 2026-04-02: max($0.01, 0.00206% of sale) rounded to cents"
+            if args.toss_fees else "uniform proportional friction per side"
+        ),
         "entry": "daily high > prior 20-day high; next daily open fill; ADX priority",
         "fixed_stop": "signal close - 2 * prior simple ATR(14); fixed; close trigger; next daily open fill",
         "existing_exit": "daily low < prior 20-day low; next daily open fill",
