@@ -22,17 +22,17 @@ from turtle_bot import SYMBOLS, calc_adx, calc_atr
 
 @dataclass
 class Position:
-    quantity: int
+    quantity: float
     entry_date: str
     entry_price: float
     stop: float
     trailing_exit: float = float("-inf")
 
 
-def load_prices(start: str, end: str) -> dict[str, pd.DataFrame]:
+def load_prices(start: str, end: str, symbols=None) -> dict[str, pd.DataFrame]:
     prices = {}
     failures = []
-    for symbol in SYMBOLS:
+    for symbol in (SYMBOLS if symbols is None else symbols):
         try:
             data = yf.download(
                 symbol, start=start, end=end, auto_adjust=True,
@@ -64,7 +64,7 @@ def load_prices(start: str, end: str) -> dict[str, pd.DataFrame]:
 
 def simulate(
     prices: dict[str, pd.DataFrame], kind: str, multiplier: int | None,
-    initial_cash: float, friction: float,
+    initial_cash: float, friction: float, fractional_symbols=frozenset(),
 ) -> tuple[dict, list[dict], pd.DataFrame]:
     dates = sorted(set().union(*(frame.index for frame in prices.values())))
     cash = initial_cash
@@ -92,12 +92,13 @@ def simulate(
         for symbol, (stop, adx) in sorted(pending_buys.items(), key=lambda item: -item[1][1]):
             if symbol not in bars or symbol in held:
                 continue
-            slots = len(SYMBOLS) - len(held)
+            slots = len(prices) - len(held)
             if slots <= 0:
                 break
             price = float(bars[symbol]["open"])
-            quantity = math.floor((cash / slots) / (price * (1 + friction)))
-            if quantity < 1:
+            affordable = (cash / slots) / (price * (1 + friction))
+            quantity = math.floor(affordable * 1e8) / 1e8 if symbol in fractional_symbols else math.floor(affordable)
+            if quantity <= 0:
                 continue
             cash -= quantity * price * (1 + friction)
             held[symbol] = Position(quantity, date.strftime("%Y-%m-%d"), price, stop)
