@@ -1,0 +1,185 @@
+"""Compare the existing exit with 22-day Chandelier exits on the watchlist.
+
+Signals use completed daily bars. Orders fill at the next available daily open.
+This is a research backtest; it does not submit brokerage orders.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import math
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+import pandas as pd
+import yfinance as yf
+
+from turtle_bot import SYMBOLS, calc_adx, calc_atr
+
+
+@dataclass
+class Position:
+    quantity: int
+    entry_date: str
+    entry_price: float
+    stop: float
+    trailing_exit: float = float("-inf")
+
+
+def load_prices(start: str, end: str) -> dict[str, pd.DataFrame]:
+    prices = {}
+    failures = []
+    for symbol in SYMBOLS:
+        try:
+            data = yf.download(
+                symbol, start=start, end=end, auto_adjust=True,
+                progress=False, threads=False, timeout=20,
+            )
+            if data.empty or len(data) < 40:
+                raise ValueError("fewer than 40 daily bars")
+            if isinstance(data.columns, pd.MultiIndex):
+                data.columns = data.columns.get_level_values(0)
+            data.columns = [str(column).lower() for column in data.columns]
+            data = data[["open", "high", "low", "close"]].dropna().copy()
+            if (data <= 0).any().any():
+                raise ValueError("nonpositive OHLC price")
+            data.index = pd.to_datetime(data.index).tz_localize(None).normalize()
+            data = data[~data.index.duplicated(keep="last")].sort_index()
+            data["high20"] = data["high"].shift(1).rolling(20).max()
+            data["low20"] = data["low"].shift(1).rolling(20).min()
+            data["high22"] = data["high"].shift(1).rolling(22).max()
+            data["atr14"] = calc_atr(data, 14).shift(1)
+            data["atr22"] = calc_atr(data, 22).shift(1)
+            data["adx"] = calc_adx(data, 14).shift(1)
+            prices[symbol] = data
+        except Exception as exc:
+            failures.append(f"{symbol}: {exc}")
+    if failures:
+        raise RuntimeError("Incomplete watchlist data; no comparison made:\n" + "\n".join(failures))
+    return prices
+
+
+def simulate(
+    prices: dict[str, pd.DataFrame], kind: str, multiplier: int | None,
+    initial_cash: float, friction: float,
+) -> tuple[dict, list[dict], pd.DataFrame]:
+    dates = sorted(set().union(*(frame.index for frame in prices.values())))
+    cash = initial_cash
+    held: dict[str, Position] = {}
+    pending_buys: dict[str, tuple[float, float]] = {}
+    pending_sells: dict[str, str] = {}
+    last_close: dict[str, float] = {}
+    trades = []
+    curve = []
+    for date in dates:
+        bars = {symbol: frame.loc[date] for symbol, frame in prices.items() if date in frame.index}
+        for symbol, reason in list(pending_sells.items()):
+            if symbol not in bars:
+                continue
+            position = held.pop(symbol)
+            price = float(bars[symbol]["open"])
+            cash += position.quantity * price * (1 - friction)
+            trades.append({
+                "symbol": symbol, "entry_date": position.entry_date,
+                "exit_date": date.strftime("%Y-%m-%d"), "entry_price": position.entry_price,
+                "exit_price": price, "quantity": position.quantity, "reason": reason,
+                "return_pct": 100 * (price * (1 - friction) / (position.entry_price * (1 + friction)) - 1),
+            })
+            del pending_sells[symbol]
+        for symbol, (stop, adx) in sorted(pending_buys.items(), key=lambda item: -item[1][1]):
+            if symbol not in bars or symbol in held:
+                continue
+            slots = len(SYMBOLS) - len(held)
+            if slots <= 0:
+                break
+            price = float(bars[symbol]["open"])
+            quantity = math.floor((cash / slots) / (price * (1 + friction)))
+            if quantity < 1:
+                continue
+            cash -= quantity * price * (1 + friction)
+            held[symbol] = Position(quantity, date.strftime("%Y-%m-%d"), price, stop)
+        pending_buys = {}
+        for symbol, bar in bars.items():
+            last_close[symbol] = float(bar["close"])
+            if symbol in held:
+                position = held[symbol]
+                if float(bar["close"]) <= position.stop:
+                    pending_sells[symbol] = "fixed_atr_stop"
+                elif kind == "existing":
+                    if pd.notna(bar["low20"]) and float(bar["low"]) < float(bar["low20"]):
+                        pending_sells[symbol] = "20_day_low"
+                elif pd.notna(bar["high22"]) and pd.notna(bar["atr22"]):
+                    raw = float(bar["high22"]) - multiplier * float(bar["atr22"])
+                    position.trailing_exit = max(position.trailing_exit, raw)
+                    if float(bar["low"]) < position.trailing_exit:
+                        pending_sells[symbol] = "chandelier"
+            elif pd.notna(bar["high20"]) and pd.notna(bar["atr14"]) and pd.notna(bar["adx"]):
+                if float(bar["high"]) > float(bar["high20"]):
+                    stop = float(bar["close"]) - 2 * float(bar["atr14"])
+                    pending_buys[symbol] = (stop, float(bar["adx"]))
+        equity = cash + sum(position.quantity * last_close[symbol] for symbol, position in held.items())
+        curve.append((date, equity, cash, len(held)))
+    daily = pd.DataFrame(curve, columns=["date", "equity", "cash", "positions"]).set_index("date")
+    years = max((daily.index[-1] - daily.index[0]).days / 365.25, 1 / 365.25)
+    total_return = daily["equity"].iloc[-1] / initial_cash - 1
+    drawdown = daily["equity"] / daily["equity"].cummax() - 1
+    summary = {
+        "variant": "existing_20_day_low" if kind == "existing" else f"chandelier_22_atr_x{multiplier}",
+        "start": daily.index[0].strftime("%Y-%m-%d"),
+        "end": daily.index[-1].strftime("%Y-%m-%d"),
+        "initial_cash": round(initial_cash, 2),
+        "final_equity": round(float(daily["equity"].iloc[-1]), 2),
+        "total_return_pct": round(100 * total_return, 2),
+        "annualized_return_pct": round(100 * ((1 + total_return) ** (1 / years) - 1), 2),
+        "max_drawdown_pct": round(100 * float(drawdown.min()), 2),
+        "closed_trades": len(trades),
+        "win_rate_pct": round(100 * sum(t["return_pct"] > 0 for t in trades) / len(trades), 2) if trades else None,
+        "mean_trade_pct": round(sum(t["return_pct"] for t in trades) / len(trades), 2) if trades else None,
+        "open_positions": len(held),
+    }
+    return summary, trades, daily
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--start", default="2021-01-01")
+    parser.add_argument(
+        "--end", default=datetime.now(ZoneInfo("America/New_York")).date().isoformat(),
+        help="exclusive end date; defaults to today's New York date",
+    )
+    parser.add_argument("--cash", type=float, default=100_000)
+    parser.add_argument("--friction", type=float, default=0.001, help="one-way proportional cost")
+    parser.add_argument("--output", type=Path, default=Path("backtest_results"))
+    args = parser.parse_args()
+    if args.cash <= 0 or not 0 <= args.friction < 1:
+        parser.error("cash must be positive and friction must be in [0, 1)")
+    prices = load_prices(args.start, args.end)
+    args.output.mkdir(parents=True, exist_ok=True)
+    all_summaries, all_trades = [], []
+    for kind, multiplier in [("existing", None)] + [("chandelier", x) for x in range(1, 6)]:
+        summary, trades, curve = simulate(prices, kind, multiplier, args.cash, args.friction)
+        all_summaries.append(summary)
+        all_trades.extend({"variant": summary["variant"], **trade} for trade in trades)
+        curve.to_csv(args.output / f"{summary['variant']}_equity.csv")
+    pd.DataFrame(all_summaries).to_csv(args.output / "summary.csv", index=False)
+    pd.DataFrame(all_trades).to_csv(args.output / "trades.csv", index=False)
+    (args.output / "assumptions.json").write_text(json.dumps({
+        "symbols": list(SYMBOLS), "price_source": "Yahoo Finance adjusted daily OHLC",
+        "start_inclusive": args.start, "end_exclusive": args.end,
+        "initial_cash_usd": args.cash, "one_way_friction_rate": args.friction,
+        "entry": "signal high > prior 20-day high; next open fill; ADX priority",
+        "fixed_stop": "signal close - 2 * prior ATR(14), fixed; close trigger; next open fill",
+        "existing_exit": "low < prior 20-day low; next open fill",
+        "chandelier_exit": "low < max since entry of (prior 22-day high - multiplier * prior ATR(22)); next open fill",
+        "sizing": "available cash / (55 - held watchlist symbols), whole shares",
+        "open_positions": "marked at latest available adjusted close",
+    }, indent=2), encoding="utf-8")
+    print(pd.DataFrame(all_summaries).to_string(index=False))
+    print(f"Results: {args.output.resolve()}")
+
+
+if __name__ == "__main__":
+    main()
