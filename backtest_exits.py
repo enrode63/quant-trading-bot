@@ -192,24 +192,42 @@ def main() -> None:
     )
     parser.add_argument("--cash", type=float, default=100_000)
     parser.add_argument("--friction", type=float, default=0.001, help="one-way proportional cost")
+    parser.add_argument("--toss-fees", action="store_true", help="use standard Toss US stock commissions and dated SEC sell fees")
     parser.add_argument("--output", type=Path, default=Path("backtest_results"))
     args = parser.parse_args()
     if args.cash <= 0 or not 0 <= args.friction < 1:
         parser.error("cash must be positive and friction must be in [0, 1)")
     prices = load_prices(args.start, args.end)
     args.output.mkdir(parents=True, exist_ok=True)
-    all_summaries, all_trades = [], []
+    all_summaries, all_trades, cost_comparison = [], [], []
     for kind, multiplier in [("existing", None)] + [("chandelier", x) for x in range(1, 6)]:
-        summary, trades, curve = simulate(prices, kind, multiplier, args.cash, args.friction)
+        summary, trades, curve = simulate(
+            prices, kind, multiplier, args.cash, args.friction, toss_fees=args.toss_fees,
+        )
         all_summaries.append(summary)
         all_trades.extend({"variant": summary["variant"], **trade} for trade in trades)
         curve.to_csv(args.output / f"{summary['variant']}_equity.csv")
+        if args.toss_fees:
+            old, _, _ = simulate(prices, kind, multiplier, args.cash, args.friction)
+            cost_comparison.append({
+                "variant": summary["variant"],
+                "uniform_cost_return_pct": old["total_return_pct"],
+                "toss_fee_return_pct": summary["total_return_pct"],
+                "difference_pct_points": round(summary["total_return_pct"] - old["total_return_pct"], 2),
+            })
     pd.DataFrame(all_summaries).to_csv(args.output / "summary.csv", index=False)
+    if cost_comparison:
+        pd.DataFrame(cost_comparison).to_csv(args.output / "cost_comparison.csv", index=False)
     pd.DataFrame(all_trades).to_csv(args.output / "trades.csv", index=False)
     (args.output / "assumptions.json").write_text(json.dumps({
         "symbols": list(SYMBOLS), "price_source": "Yahoo Finance adjusted daily OHLC",
         "start_inclusive": args.start, "end_exclusive": args.end,
-        "initial_cash_usd": args.cash, "one_way_friction_rate": args.friction,
+        "initial_cash_usd": args.cash, "one_way_friction_rate": 0 if args.toss_fees else args.friction,
+        "fee_model": (
+            "Toss standard US stock commission: 0.1% each side, truncate below $0.01, waive order gross <= $10; "
+            "SEC sell fee from 2026-04-02: max($0.01, 0.00206% of sale) rounded to cents"
+            if args.toss_fees else "uniform proportional friction per side"
+        ),
         "entry": "signal high > prior 20-day high; next open fill; ADX priority",
         "fixed_stop": "signal close - 2 * prior ATR(14), fixed; close trigger; next open fill",
         "existing_exit": "low < prior 20-day low; next open fill",
