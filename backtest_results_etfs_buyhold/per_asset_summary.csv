@@ -1,0 +1,4 @@
+assets,start,end,initial_cash,final_equity_held,held_return_pct,held_annualized_pct,max_drawdown_pct,buy_commission_usd,hypothetical_sell_commission_usd,hypothetical_sec_fee_usd,hypothetical_liquidation_return_pct,cash_leftover_usd
+QQQ,2021-01-04,2026-10-12,100000.0,244200.98,144.2,16.74,-35.05,99.65,243.95,5.03,143.95,245.91
+SPY,2021-01-04,2026-10-12,100000.0,223445.75,123.45,14.96,-24.47,99.76,223.31,4.6,123.22,131.06
+DIA,2021-01-04,2026-10-12,100000.0,186165.64,86.17,11.37,-20.72,99.66,185.92,3.83,85.98,235.96
