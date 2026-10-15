@@ -180,5 +180,20 @@
     "entry_price": 140.32,
     "stop_price": 129.77,
     "entry_date": "2026-10-13"
+  },
+  "BLK": {
+    "entry_price": 1073.79,
+    "stop_price": 1031.44,
+    "entry_date": "2026-10-15"
+  },
+  "COP": {
+    "entry_price": 142.34,
+    "stop_price": 136.24,
+    "entry_date": "2026-10-15"
+  },
+  "EOG": {
+    "entry_price": 154.19,
+    "stop_price": 147.69,
+    "entry_date": "2026-10-15"
   }
 }
