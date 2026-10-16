@@ -111,11 +111,6 @@
     "stop_price": 176.5,
     "entry_date": "2026-07-17"
   },
-  "NVDA": {
-    "entry_price": 219.22,
-    "stop_price": 203.72,
-    "entry_date": "2026-08-06"
-  },
   "MSTR": {
     "entry_price": 100.01,
     "stop_price": 88.97,
@@ -126,20 +121,10 @@
     "stop_price": 154.62,
     "entry_date": "2026-08-21"
   },
-  "QCOM": {
-    "entry_price": 170.48,
-    "stop_price": 160.88,
-    "entry_date": "2026-09-01"
-  },
   "META": {
     "entry_price": 610.68,
     "stop_price": 573.39,
     "entry_date": "2026-09-04"
-  },
-  "NET": {
-    "entry_price": 330.36,
-    "stop_price": 297.79,
-    "entry_date": "2026-09-15"
   },
   "GOOGL": {
     "entry_price": 349.54,
@@ -195,5 +180,10 @@
     "entry_price": 154.19,
     "stop_price": 147.69,
     "entry_date": "2026-10-15"
+  },
+  "INTU": {
+    "entry_price": 330.17,
+    "stop_price": 309.73,
+    "entry_date": "2026-10-16"
   }
 }
