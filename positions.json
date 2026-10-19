@@ -111,11 +111,6 @@
     "stop_price": 176.5,
     "entry_date": "2026-07-17"
   },
-  "MSTR": {
-    "entry_price": 100.01,
-    "stop_price": 88.97,
-    "entry_date": "2026-08-10"
-  },
   "COIN": {
     "entry_price": 172.35,
     "stop_price": 154.62,
@@ -151,11 +146,6 @@
     "stop_price": 249.37,
     "entry_date": "2026-10-08"
   },
-  "TSLA": {
-    "entry_price": 382.7,
-    "stop_price": 360.57,
-    "entry_date": "2026-10-12"
-  },
   "WMT": {
     "entry_price": 111.35,
     "stop_price": 106.73,
@@ -185,5 +175,10 @@
     "entry_price": 330.17,
     "stop_price": 309.73,
     "entry_date": "2026-10-16"
+  },
+  "LMT": {
+    "entry_price": 552.09,
+    "stop_price": 532.41,
+    "entry_date": "2026-10-19"
   }
 }
