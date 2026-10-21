@@ -116,11 +116,6 @@
     "stop_price": 154.62,
     "entry_date": "2026-08-21"
   },
-  "META": {
-    "entry_price": 610.68,
-    "stop_price": 573.39,
-    "entry_date": "2026-09-04"
-  },
   "GOOGL": {
     "entry_price": 349.54,
     "stop_price": 333.68,
@@ -180,5 +175,10 @@
     "entry_price": 552.09,
     "stop_price": 532.41,
     "entry_date": "2026-10-19"
+  },
+  "NOC": {
+    "entry_price": 534.0,
+    "stop_price": 509.47,
+    "entry_date": "2026-10-21"
   }
 }
