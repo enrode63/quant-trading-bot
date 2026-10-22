@@ -116,11 +116,6 @@
     "stop_price": 154.62,
     "entry_date": "2026-08-21"
   },
-  "GOOGL": {
-    "entry_price": 349.54,
-    "stop_price": 333.68,
-    "entry_date": "2026-09-21"
-  },
   "PLTR": {
     "entry_price": 191.79,
     "stop_price": 177.68,
@@ -180,5 +175,10 @@
     "entry_price": 534.0,
     "stop_price": 509.47,
     "entry_date": "2026-10-21"
+  },
+  "TSLA": {
+    "entry_price": 386.47,
+    "stop_price": 362.95,
+    "entry_date": "2026-10-22"
   }
 }
