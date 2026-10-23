@@ -180,5 +180,15 @@
     "entry_price": 386.47,
     "stop_price": 362.95,
     "entry_date": "2026-10-22"
+  },
+  "MCD": {
+    "entry_price": 252.63,
+    "stop_price": 244.57,
+    "entry_date": "2026-10-23"
+  },
+  "SPOT": {
+    "entry_price": 583.66,
+    "stop_price": 547.04,
+    "entry_date": "2026-10-23"
   }
 }
