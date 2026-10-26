@@ -111,11 +111,6 @@
     "stop_price": 176.5,
     "entry_date": "2026-07-17"
   },
-  "COIN": {
-    "entry_price": 172.35,
-    "stop_price": 154.62,
-    "entry_date": "2026-08-21"
-  },
   "PLTR": {
     "entry_price": 191.79,
     "stop_price": 177.68,
@@ -130,11 +125,6 @@
     "entry_price": 935.68,
     "stop_price": 906.6,
     "entry_date": "2026-10-07"
-  },
-  "AMZN": {
-    "entry_price": 259.92,
-    "stop_price": 249.37,
-    "entry_date": "2026-10-08"
   },
   "WMT": {
     "entry_price": 111.35,
@@ -190,5 +180,10 @@
     "entry_price": 583.66,
     "stop_price": 547.04,
     "entry_date": "2026-10-23"
+  },
+  "SLB": {
+    "entry_price": 53.06,
+    "stop_price": 50.24,
+    "entry_date": "2026-10-26"
   }
 }
