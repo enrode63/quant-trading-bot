@@ -176,14 +176,14 @@
     "stop_price": 244.57,
     "entry_date": "2026-10-23"
   },
-  "SPOT": {
-    "entry_price": 583.66,
-    "stop_price": 547.04,
-    "entry_date": "2026-10-23"
-  },
   "SLB": {
     "entry_price": 53.06,
     "stop_price": 50.24,
     "entry_date": "2026-10-26"
+  },
+  "ORCL": {
+    "entry_price": 144.54,
+    "stop_price": 130.89,
+    "entry_date": "2026-10-29"
   }
 }
