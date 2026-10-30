@@ -131,11 +131,6 @@
     "stop_price": 106.73,
     "entry_date": "2026-10-12"
   },
-  "NOW": {
-    "entry_price": 140.32,
-    "stop_price": 129.77,
-    "entry_date": "2026-10-13"
-  },
   "BLK": {
     "entry_price": 1073.79,
     "stop_price": 1031.44,
