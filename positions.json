@@ -111,16 +111,6 @@
     "stop_price": 176.5,
     "entry_date": "2026-07-17"
   },
-  "PLTR": {
-    "entry_price": 191.79,
-    "stop_price": 177.68,
-    "entry_date": "2026-09-24"
-  },
-  "DDOG": {
-    "entry_price": 251.49,
-    "stop_price": 228.7,
-    "entry_date": "2026-09-24"
-  },
   "COST": {
     "entry_price": 935.68,
     "stop_price": 906.6,
@@ -176,9 +166,9 @@
     "stop_price": 50.24,
     "entry_date": "2026-10-26"
   },
-  "ORCL": {
-    "entry_price": 144.54,
-    "stop_price": 130.89,
-    "entry_date": "2026-10-29"
+  "SPOT": {
+    "entry_price": 593.44,
+    "stop_price": 550.08,
+    "entry_date": "2026-11-02"
   }
 }
