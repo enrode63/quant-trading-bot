@@ -96,11 +96,6 @@
     "stop_price": 298.39,
     "entry_date": "2026-07-10"
   },
-  "MSFT": {
-    "entry_price": 401.1,
-    "stop_price": 376.12,
-    "entry_date": "2026-07-17"
-  },
   "XOM": {
     "entry_price": 145.95,
     "stop_price": 140.0,
