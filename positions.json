@@ -91,11 +91,6 @@
     "entry_price": 193.18,
     "entry_date": "2026-07-02"
   },
-  "AAPL": {
-    "entry_price": 316.22,
-    "stop_price": 298.39,
-    "entry_date": "2026-07-10"
-  },
   "XOM": {
     "entry_price": 145.95,
     "stop_price": 140.0,
