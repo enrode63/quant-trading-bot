@@ -121,11 +121,6 @@
     "stop_price": 136.24,
     "entry_date": "2026-10-15"
   },
-  "EOG": {
-    "entry_price": 154.19,
-    "stop_price": 147.69,
-    "entry_date": "2026-10-15"
-  },
   "INTU": {
     "entry_price": 330.17,
     "stop_price": 309.73,
@@ -160,5 +155,20 @@
     "entry_price": 593.44,
     "stop_price": 550.08,
     "entry_date": "2026-11-02"
+  },
+  "MSFT": {
+    "entry_price": 555.8,
+    "stop_price": 529.78,
+    "entry_date": "2026-11-05"
+  },
+  "AAPL": {
+    "entry_price": 349.51,
+    "stop_price": 334.89,
+    "entry_date": "2026-11-05"
+  },
+  "AMZN": {
+    "entry_price": 266.03,
+    "stop_price": 249.33,
+    "entry_date": "2026-11-05"
   }
 }
