@@ -91,11 +91,6 @@
     "entry_price": 193.18,
     "entry_date": "2026-07-02"
   },
-  "XOM": {
-    "entry_price": 145.95,
-    "stop_price": 140.0,
-    "entry_date": "2026-07-17"
-  },
   "CVX": {
     "entry_price": 183.86,
     "stop_price": 176.5,
@@ -116,11 +111,6 @@
     "stop_price": 1031.44,
     "entry_date": "2026-10-15"
   },
-  "COP": {
-    "entry_price": 142.34,
-    "stop_price": 136.24,
-    "entry_date": "2026-10-15"
-  },
   "INTU": {
     "entry_price": 330.17,
     "stop_price": 309.73,
@@ -136,20 +126,10 @@
     "stop_price": 509.47,
     "entry_date": "2026-10-21"
   },
-  "TSLA": {
-    "entry_price": 386.47,
-    "stop_price": 362.95,
-    "entry_date": "2026-10-22"
-  },
   "MCD": {
     "entry_price": 252.63,
     "stop_price": 244.57,
     "entry_date": "2026-10-23"
-  },
-  "SLB": {
-    "entry_price": 53.06,
-    "stop_price": 50.24,
-    "entry_date": "2026-10-26"
   },
   "SPOT": {
     "entry_price": 593.44,
