@@ -145,5 +145,10 @@
     "entry_price": 266.03,
     "stop_price": 249.33,
     "entry_date": "2026-11-05"
+  },
+  "TMUS": {
+    "entry_price": 168.71,
+    "stop_price": 155.65,
+    "entry_date": "2026-11-10"
   }
 }
