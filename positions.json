@@ -131,11 +131,6 @@
     "stop_price": 550.08,
     "entry_date": "2026-11-02"
   },
-  "MSFT": {
-    "entry_price": 555.8,
-    "stop_price": 529.78,
-    "entry_date": "2026-11-05"
-  },
   "AAPL": {
     "entry_price": 349.51,
     "stop_price": 334.89,
@@ -150,5 +145,10 @@
     "entry_price": 168.71,
     "stop_price": 155.65,
     "entry_date": "2026-11-10"
+  },
+  "AVGO": {
+    "entry_price": 345.22,
+    "stop_price": 310.65,
+    "entry_date": "2026-11-12"
   }
 }
