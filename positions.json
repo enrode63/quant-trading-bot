@@ -106,11 +106,6 @@
     "stop_price": 1031.44,
     "entry_date": "2026-10-15"
   },
-  "INTU": {
-    "entry_price": 330.17,
-    "stop_price": 309.73,
-    "entry_date": "2026-10-16"
-  },
   "LMT": {
     "entry_price": 552.09,
     "stop_price": 532.41,
